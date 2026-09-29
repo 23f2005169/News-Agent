@@ -1,13 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import type { Database } from "@/integrations/supabase/types";
+
+// External read-only dataset: the owner's own Supabase project.
+// A publishable key is public by design, so these constants are safe in code.
+const DATASET_URL = "https://ysvxlcynxomtmgnlties.supabase.co";
+const DATASET_KEY = "sb_publishable_7zOwBVQ9ZMqwyjDehpoDqw_DRy9C7AF";
 
 function publicClient() {
-  const url = process.env["SUPABASE_URL"];
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
-  if (!url || !key) throw new Error("The reading collection is unavailable.");
-  return createClient<Database>(url, key, {
+  return createClient(DATASET_URL, DATASET_KEY, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
 }
@@ -22,14 +23,21 @@ export const getItems = createServerFn({ method: "GET" }).handler(async () => {
   return data ?? [];
 });
 
+type ArticleRow = {
+  id: string;
+  title: string | null;
+  raw_text: string | null;
+  scraped_category: string | null;
+};
+
 export const getItem = createServerFn({ method: "GET" })
   .inputValidator((id: string) => z.string().min(1).parse(id))
-  .handler(async ({ data: id }) => {
+  .handler(async ({ data: id }): Promise<ArticleRow | null> => {
     const { data, error } = await publicClient()
       .from("items")
       .select("id,title,raw_text,scraped_category")
       .eq("id", id)
-      .maybeSingle();
+      .maybeSingle<ArticleRow>();
     if (error) throw new Error("This article could not be loaded.");
     return data;
   });
