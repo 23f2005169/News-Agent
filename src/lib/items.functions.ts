@@ -1,13 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import type { Database } from "@/integrations/supabase/types";
+
+// External read-only dataset: the owner's own Supabase project.
+// A publishable key is public by design, so these constants are safe in code.
+const DATASET_URL = "https://ysvxlcynxomtmgnlties.supabase.co";
+const DATASET_KEY = "sb_publishable_7zOwBVQ9ZMqwyjDehpoDqw_DRy9C7AF";
 
 function publicClient() {
-  const url = process.env["SUPABASE_URL"];
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
-  if (!url || !key) throw new Error("The reading collection is unavailable.");
-  return createClient<Database>(url, key, {
+  return createClient(DATASET_URL, DATASET_KEY, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
 }
