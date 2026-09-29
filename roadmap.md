@@ -1,0 +1,3 @@
+- [x] Create a public reading collection with the brief's fields and read-only access.
+- [ ] Build the text-only feed with source filters.
+- [ ] Build the article page and verify both pages.
