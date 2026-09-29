@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Public reading pages fetch only the requested `items` columns through unauthenticated server functions; this keeps SSR shareable and avoids exposing unrelated columns.
