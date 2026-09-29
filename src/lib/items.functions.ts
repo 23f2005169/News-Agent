@@ -23,14 +23,21 @@ export const getItems = createServerFn({ method: "GET" }).handler(async () => {
   return data ?? [];
 });
 
+type ArticleRow = {
+  id: string;
+  title: string | null;
+  raw_text: string | null;
+  scraped_category: string | null;
+};
+
 export const getItem = createServerFn({ method: "GET" })
   .inputValidator((id: string) => z.string().min(1).parse(id))
-  .handler(async ({ data: id }) => {
+  .handler(async ({ data: id }): Promise<ArticleRow | null> => {
     const { data, error } = await publicClient()
       .from("items")
       .select("id,title,raw_text,scraped_category")
       .eq("id", id)
-      .maybeSingle();
+      .maybeSingle<ArticleRow>();
     if (error) throw new Error("This article could not be loaded.");
     return data;
   });
