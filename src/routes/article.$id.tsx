@@ -1,6 +1,9 @@
+// ============= Full file contents =============
+
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { getItem } from "@/lib/items.functions";
+import { SiteHeader } from "@/components/site-header";
 
 const itemQuery = (id: string) => queryOptions({
   queryKey: ["item", id],
@@ -16,10 +19,10 @@ export const Route = createFileRoute("/article/$id")({
   head: ({ loaderData }) => {
     const title = loaderData?.title || "Article";
     return { meta: [
-      { title: `${title} — AI Field Notes` },
-      { name: "description", content: `Read ${title} on AI Field Notes.` },
-      { property: "og:title", content: `${title} — AI Field Notes` },
-      { property: "og:description", content: `Read ${title} on AI Field Notes.` },
+      { title: `${title} — Chronologicals of AI` },
+      { name: "description", content: `Read ${title} on Chronologicals of AI.` },
+      { property: "og:title", content: `${title} — Chronologicals of AI` },
+      { property: "og:description", content: `Read ${title} on Chronologicals of AI.` },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
     ] };
@@ -30,7 +33,7 @@ export const Route = createFileRoute("/article/$id")({
 });
 
 function ArticleMessage({ message }: { message: string }) {
-  return <main className="mx-auto max-w-[720px] px-6 pb-28 pt-20 sm:px-8 sm:pt-28"><p className="font-serif text-3xl">{message}</p><Link to="/" className="mt-12 inline-block text-sm text-primary hover:underline">Back to feed</Link></main>;
+  return <><SiteHeader /><main className="mx-auto max-w-[720px] px-6 pb-28 pt-16 sm:px-8"><p className="font-display text-3xl font-bold">{message}</p><Link to="/" className="mt-12 inline-block text-sm font-medium text-primary hover:underline">Back to feed</Link></main></>;
 }
 
 function Article() {
@@ -39,13 +42,20 @@ function Article() {
   const paragraphs = item.raw_text?.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean) ?? [];
 
   return (
-    <main className="mx-auto max-w-[720px] px-6 pb-32 pt-20 sm:px-8 sm:pt-28">
-      {item.scraped_category && <p className="mb-5 text-sm font-medium text-primary">{item.scraped_category}</p>}
-      <h1 className="font-serif text-[clamp(2.75rem,5vw,4.25rem)] font-semibold leading-[1.1]">{item.title || "Untitled article"}</h1>
-      <div className="mt-10 border-t border-border pt-10 font-serif text-[1.25rem] leading-[1.8] sm:mt-14 sm:pt-12 sm:text-[1.35rem]">
-        {paragraphs.map((paragraph, index) => <p key={index} className="mb-7 whitespace-pre-line last:mb-0">{paragraph}</p>)}
-      </div>
-      <Link to="/" className="mt-16 inline-block text-sm text-primary hover:underline focus-visible:outline-none focus-visible:underline">Back to feed</Link>
-    </main>
+    <>
+      <SiteHeader />
+      <main className="mx-auto max-w-[720px] px-6 pb-32 pt-14 sm:px-8 sm:pt-20">
+        {item.scraped_category && (
+          <span className="inline-flex items-center rounded-full bg-primary/12 px-3 py-1 font-mono text-[0.7rem] font-medium uppercase tracking-wider text-primary">
+            {item.scraped_category}
+          </span>
+        )}
+        <h1 className="mt-5 font-display text-[clamp(2.5rem,5vw,3.75rem)] font-bold leading-[1.08] tracking-tight">{item.title || "Untitled article"}</h1>
+        <div className="mt-10 border-t border-border pt-10 font-serif text-[1.25rem] leading-[1.8] sm:mt-12 sm:pt-12 sm:text-[1.35rem]">
+          {paragraphs.map((paragraph, index) => <p key={index} className="mb-7 whitespace-pre-line last:mb-0">{paragraph}</p>)}
+        </div>
+        <Link to="/" className="mt-16 inline-block text-sm font-medium text-primary hover:underline focus-visible:outline-none focus-visible:underline">Back to feed</Link>
+      </main>
+    </>
   );
 }
