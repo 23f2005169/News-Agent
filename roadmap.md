@@ -1,4 +1,4 @@
 - [x] Create a public reading collection with the brief's fields and read-only access.
 - [x] Enable the project's data connection.
 - [x] Build the text-only feed with source filters.
-- [ ] Build the article page and verify both pages.
+- [x] Build the article page and verify both pages.
