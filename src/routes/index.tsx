@@ -73,7 +73,19 @@ function Feed() {
             Everything worth reading in AI, newest first — research, tools and releases.
           </p>
 
-          <div className="mt-9 flex flex-wrap items-center gap-2.5" aria-label="Filter by source">
+          <div className="relative mt-9 max-w-md">
+            <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search articles…"
+              aria-label="Search articles"
+              className="h-11 w-full rounded-full border border-border bg-card pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+          </div>
+
+          <div className="mt-5 flex flex-wrap items-center gap-2.5" aria-label="Filter by source">
             {filters.map((filter) => (
               <Button
                 key={filter.value}
