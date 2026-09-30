@@ -112,9 +112,11 @@ function Article() {
           </span>
         )}
         <h1 className="mt-5 font-display text-[clamp(2.5rem,5vw,3.75rem)] font-bold leading-[1.08] tracking-tight">{item.title || "Untitled article"}</h1>
+        <Prerequisites id={id} />
         <div className="mt-10 border-t border-border pt-10 font-serif text-[1.25rem] leading-[1.8] sm:mt-12 sm:pt-12 sm:text-[1.35rem]">
           {paragraphs.map((paragraph, index) => <p key={index} className="mb-7 whitespace-pre-line last:mb-0">{paragraph}</p>)}
         </div>
+        <Suggestions id={id} />
         <Link to="/" className="mt-16 inline-block text-sm font-medium text-primary hover:underline focus-visible:outline-none focus-visible:underline">Back to feed</Link>
       </main>
     </>
