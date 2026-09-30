@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { Bookmark } from "lucide-react";
+import { Bookmark, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
 import { getItems } from "@/lib/items.functions";
@@ -46,10 +46,20 @@ function Tag({ label, tone }: { label: string; tone: "accent" | "neutral" }) {
   );
 }
 
+// Search shell: placeholder matching until the real search logic is wired in.
+// TODO(owner): replace `matchesQuery` with the real search implementation.
+function matchesQuery(item: { title?: string | null; summary?: string | null }, query: string): boolean {
+  if (!query) return true;
+  const q = query.toLowerCase();
+  return (item.title ?? "").toLowerCase().includes(q) || (item.summary ?? "").toLowerCase().includes(q);
+}
+
 function Feed() {
   const { data: items } = useSuspenseQuery(itemsQuery);
   const [source, setSource] = useState<Source>("all");
-  const visible = source === "all" ? items : items.filter((item) => item.source_type?.toLowerCase() === source);
+  const [query, setQuery] = useState("");
+  const visible = (source === "all" ? items : items.filter((item) => item.source_type?.toLowerCase() === source))
+    .filter((item) => matchesQuery(item, query));
 
   return (
     <>
