@@ -36,6 +36,67 @@ function ArticleMessage({ message }: { message: string }) {
   return <><SiteHeader /><main className="mx-auto max-w-[720px] px-6 pb-28 pt-16 sm:px-8"><p className="font-display text-3xl font-bold">{message}</p><Link to="/" className="mt-12 inline-block text-sm font-medium text-primary hover:underline">Back to feed</Link></main></>;
 }
 
+// Prerequisites shell: the backend will supply topic/keyword names (not article titles).
+// TODO(owner): replace this stub with the real prerequisites fetch.
+async function getPrerequisites(_id: string): Promise<string[]> {
+  return [];
+}
+
+// Suggestions shell: will be filled by semantic search over embeddings (backend).
+// TODO(owner): replace this stub with the semantic-search recommendations fetch.
+async function getSuggestions(_id: string): Promise<{ id: string; title: string }[]> {
+  return [];
+}
+
+const prerequisitesQuery = (id: string) => queryOptions({
+  queryKey: ["prerequisites", id],
+  queryFn: () => getPrerequisites(id),
+});
+
+const suggestionsQuery = (id: string) => queryOptions({
+  queryKey: ["suggestions", id],
+  queryFn: () => getSuggestions(id),
+});
+
+function Prerequisites({ id }: { id: string }) {
+  const { data: prerequisites } = useSuspenseQuery(prerequisitesQuery(id));
+  if (prerequisites.length === 0) return null;
+  return (
+    <section aria-label="Prerequisites" className="mt-8 rounded-2xl border border-border bg-card p-5">
+      <h2 className="font-mono text-[0.7rem] font-medium uppercase tracking-wider text-muted-foreground">Before you read</h2>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {prerequisites.map((topic) => (
+          <span key={topic} className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-sm text-foreground">
+            {topic}
+          </span>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Suggestions({ id }: { id: string }) {
+  const { data: suggestions } = useSuspenseQuery(suggestionsQuery(id));
+  if (suggestions.length === 0) return null;
+  return (
+    <section aria-label="More like this" className="mt-16 border-t border-border pt-10">
+      <h2 className="font-mono text-[0.7rem] font-medium uppercase tracking-wider text-muted-foreground">More like this</h2>
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {suggestions.map((suggestion) => (
+          <Link
+            key={suggestion.id}
+            to="/article/$id"
+            params={{ id: suggestion.id }}
+            className="rounded-2xl border border-border bg-card p-5 font-display text-base font-bold leading-snug text-foreground no-underline transition-colors hover:border-primary/50 hover:text-primary"
+          >
+            {suggestion.title}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Article() {
   const { id } = Route.useParams();
   const { data: item } = useSuspenseQuery(itemQuery(id));
