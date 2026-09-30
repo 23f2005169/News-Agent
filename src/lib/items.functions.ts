@@ -16,7 +16,7 @@ function publicClient() {
 export const getItems = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await publicClient()
     .from("items")
-    .select("id,title,summary,scraped_category,source_type,word_count,published_date")
+    .select("id,title,summary,subfield_tag,source_type,word_count,published_date")
     .order("published_date", { ascending: false, nullsFirst: false })
     .order("id", { ascending: true });
   if (error) throw new Error("The reading collection could not be loaded.");

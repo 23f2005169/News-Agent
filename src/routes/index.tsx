@@ -93,8 +93,7 @@ function Feed() {
                   className="group flex h-full flex-col rounded-2xl border border-border bg-card p-6 no-underline transition-all duration-200 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_14px_36px_-16px_color-mix(in_oklab,var(--primary)_38%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <div className="flex flex-wrap gap-2">
-                    {item.scraped_category && <Tag label={item.scraped_category} tone="accent" />}
-                    <Tag label={item.source_type || "source"} tone="neutral" />
+                    {item.subfield_tag && <Tag label={item.subfield_tag} tone="accent" />}
                   </div>
                   <h2 className="mt-4 font-display text-xl font-bold leading-snug tracking-tight text-foreground transition-colors group-hover:text-primary">
                     {item.title || "Untitled article"}
