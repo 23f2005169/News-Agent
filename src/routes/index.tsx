@@ -97,9 +97,6 @@ function Feed() {
                 {filter.label}
               </Button>
             ))}
-            <span className="ml-auto font-mono text-xs uppercase tracking-wider text-muted-foreground">
-              {visible.length} {visible.length === 1 ? "entry" : "entries"}
-            </span>
           </div>
         </section>
 

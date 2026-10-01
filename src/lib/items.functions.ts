@@ -26,8 +26,8 @@ export const getItems = createServerFn({ method: "GET" }).handler(async () => {
 type ArticleRow = {
   id: string;
   title: string | null;
-  raw_text: string | null;
-  scraped_category: string | null;
+  summary: string | null;
+  subfield_tag: string | null;
 };
 
 export const getItem = createServerFn({ method: "GET" })
@@ -35,7 +35,7 @@ export const getItem = createServerFn({ method: "GET" })
   .handler(async ({ data: id }): Promise<ArticleRow | null> => {
     const { data, error } = await publicClient()
       .from("items")
-      .select("id,title,raw_text,scraped_category")
+      .select("id,title,summary,subfield_tag")
       .eq("id", id)
       .maybeSingle<ArticleRow>();
     if (error) throw new Error("This article could not be loaded.");

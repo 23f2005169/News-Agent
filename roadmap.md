@@ -3,3 +3,4 @@
 - [x] Build the text-only feed with source filters.
 - [x] Build the article page and verify both pages.- [x] Rename site to "Chronologicals of AI", card-grid feed, header with non-clickable login icon, livelier look.
 - [x] Show sub-field tag on cards instead of scraped category; remove source chip from card top.
+- [x] Remove article count; divide article pages into prerequisites, summary, and up to three suggested articles.
