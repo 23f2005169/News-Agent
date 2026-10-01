@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Public reading pages fetch only the requested `items` columns through unauthenticated server functions; this keeps SSR shareable and avoids exposing unrelated columns.
+- Article prerequisites and related suggestions remain replaceable query shells in the article route; this keeps their future backend data separate from the public article read.
