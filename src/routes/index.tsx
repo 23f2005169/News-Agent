@@ -1,6 +1,6 @@
 // ============= Full file contents =============
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { Bookmark, Search } from "lucide-react";
@@ -46,8 +46,23 @@ function Tag({ label, tone }: { label: string; tone: "accent" | "neutral" }) {
   );
 }
 
-// Search shell: placeholder matching until the real search logic is wired in.
-// TODO(owner): replace `matchesQuery` with the real search implementation.
+// Search shell: calls the backend search endpoint once it exists.
+// TODO(owner): set BACKEND_URL to the real backend origin (e.g. https://api.example.com).
+const BACKEND_URL = "";
+
+type SearchResult = { id: string };
+
+// Returns matching article ids from the backend, or null when the backend
+// is not configured / unreachable so the caller can fall back to local matching.
+async function searchBackend(query: string): Promise<string[] | null> {
+  if (!BACKEND_URL) return null;
+  const res = await fetch(`${BACKEND_URL}/search?q=${encodeURIComponent(query)}`);
+  if (!res.ok) throw new Error(`Search request failed (${res.status})`);
+  const { results } = (await res.json()) as { results: SearchResult[] };
+  return results.map((r) => r.id);
+}
+
+// Placeholder matching until the backend search is wired in.
 function matchesQuery(item: { title?: string | null; summary?: string | null }, query: string): boolean {
   if (!query) return true;
   const q = query.toLowerCase();
@@ -58,8 +73,40 @@ function Feed() {
   const { data: items } = useSuspenseQuery(itemsQuery);
   const [source, setSource] = useState<Source>("all");
   const [query, setQuery] = useState("");
+  const [backendIds, setBackendIds] = useState<string[] | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
+
+  // Debounced backend search; falls back to local placeholder matching
+  // while BACKEND_URL is unset or the request fails.
+  useEffect(() => {
+    if (!query) {
+      setBackendIds(null);
+      setSearchError(null);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const ids = await searchBackend(query);
+        if (!cancelled) {
+          setBackendIds(ids);
+          setSearchError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setBackendIds(null);
+          setSearchError(err instanceof Error ? err.message : "Search failed");
+        }
+      }
+    }, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [query]);
+
   const visible = (source === "all" ? items : items.filter((item) => item.source_type?.toLowerCase() === source))
-    .filter((item) => matchesQuery(item, query));
+    .filter((item) => (backendIds ? backendIds.includes(item.id) : matchesQuery(item, query)));
 
   return (
     <>
@@ -84,6 +131,11 @@ function Feed() {
               className="h-11 w-full rounded-full border border-border bg-card pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </div>
+          {searchError && (
+            <p className="mt-2 max-w-md text-xs text-destructive" role="alert">
+              Search is unavailable right now — showing local matches instead. ({searchError})
+            </p>
+          )}
 
           <div className="mt-5 flex flex-wrap items-center gap-2.5" aria-label="Filter by source">
             {filters.map((filter) => (
@@ -101,7 +153,7 @@ function Feed() {
         </section>
 
         {visible.length === 0 ? (
-          <p className="py-16 text-sm leading-relaxed text-muted-foreground">{items.length === 0 ? "No articles yet." : `No ${source === "arxiv" ? "ArXiv" : "GitHub"} articles yet.`}</p>
+          <p className="py-16 text-sm leading-relaxed text-muted-foreground">{query ? "No articles match your search." : items.length === 0 ? "No articles yet." : `No ${source === "arxiv" ? "ArXiv" : "GitHub"} articles yet.`}</p>
         ) : (
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((item) => (
