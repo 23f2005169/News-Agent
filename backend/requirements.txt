@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+pydantic-settings
+sqlalchemy
+psycopg2-binary
+chromadb
+neo4j
+langgraph
+langchain-anthropic
+httpx
+sentence-transformers
