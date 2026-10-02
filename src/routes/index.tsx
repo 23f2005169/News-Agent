@@ -73,8 +73,40 @@ function Feed() {
   const { data: items } = useSuspenseQuery(itemsQuery);
   const [source, setSource] = useState<Source>("all");
   const [query, setQuery] = useState("");
+  const [backendIds, setBackendIds] = useState<string[] | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
+
+  // Debounced backend search; falls back to local placeholder matching
+  // while BACKEND_URL is unset or the request fails.
+  useEffect(() => {
+    if (!query) {
+      setBackendIds(null);
+      setSearchError(null);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const ids = await searchBackend(query);
+        if (!cancelled) {
+          setBackendIds(ids);
+          setSearchError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setBackendIds(null);
+          setSearchError(err instanceof Error ? err.message : "Search failed");
+        }
+      }
+    }, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [query]);
+
   const visible = (source === "all" ? items : items.filter((item) => item.source_type?.toLowerCase() === source))
-    .filter((item) => matchesQuery(item, query));
+    .filter((item) => (backendIds ? backendIds.includes(item.id) : matchesQuery(item, query)));
 
   return (
     <>
