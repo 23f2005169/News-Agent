@@ -153,7 +153,7 @@ function Feed() {
         </section>
 
         {visible.length === 0 ? (
-          <p className="py-16 text-sm leading-relaxed text-muted-foreground">{items.length === 0 ? "No articles yet." : `No ${source === "arxiv" ? "ArXiv" : "GitHub"} articles yet.`}</p>
+          <p className="py-16 text-sm leading-relaxed text-muted-foreground">{query ? "No articles match your search." : items.length === 0 ? "No articles yet." : `No ${source === "arxiv" ? "ArXiv" : "GitHub"} articles yet.`}</p>
         ) : (
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((item) => (
