@@ -1,6 +1,6 @@
 // ============= Full file contents =============
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { Bookmark, Search } from "lucide-react";
@@ -46,8 +46,23 @@ function Tag({ label, tone }: { label: string; tone: "accent" | "neutral" }) {
   );
 }
 
-// Search shell: placeholder matching until the real search logic is wired in.
-// TODO(owner): replace `matchesQuery` with the real search implementation.
+// Search shell: calls the backend search endpoint once it exists.
+// TODO(owner): set BACKEND_URL to the real backend origin (e.g. https://api.example.com).
+const BACKEND_URL = "";
+
+type SearchResult = { id: string };
+
+// Returns matching article ids from the backend, or null when the backend
+// is not configured / unreachable so the caller can fall back to local matching.
+async function searchBackend(query: string): Promise<string[] | null> {
+  if (!BACKEND_URL) return null;
+  const res = await fetch(`${BACKEND_URL}/search?q=${encodeURIComponent(query)}`);
+  if (!res.ok) throw new Error(`Search request failed (${res.status})`);
+  const { results } = (await res.json()) as { results: SearchResult[] };
+  return results.map((r) => r.id);
+}
+
+// Placeholder matching until the backend search is wired in.
 function matchesQuery(item: { title?: string | null; summary?: string | null }, query: string): boolean {
   if (!query) return true;
   const q = query.toLowerCase();
