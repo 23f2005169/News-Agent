@@ -131,6 +131,11 @@ function Feed() {
               className="h-11 w-full rounded-full border border-border bg-card pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
           </div>
+          {searchError && (
+            <p className="mt-2 max-w-md text-xs text-destructive" role="alert">
+              Search is unavailable right now — showing local matches instead. ({searchError})
+            </p>
+          )}
 
           <div className="mt-5 flex flex-wrap items-center gap-2.5" aria-label="Filter by source">
             {filters.map((filter) => (
