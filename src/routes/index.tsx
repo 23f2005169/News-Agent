@@ -9,12 +9,19 @@ import { SiteHeader } from "@/components/site-header";
 import { getItems } from "@/lib/items.functions";
 
 const itemsQuery = queryOptions({ queryKey: ["items"], queryFn: () => getItems() });
-type Source = "all" | "arxiv" | "github";
+type Source = "all" | "article" | "course_portal" | "arxiv" | "github";
 const filters: { label: string; value: Source }[] = [
   { label: "All", value: "all" },
+  { label: "Data Stories", value: "article" },
+  { label: "Labs", value: "course_portal" },
   { label: "ArXiv", value: "arxiv" },
   { label: "GitHub", value: "github" },
 ];
+// Friendly display names for raw source_type values.
+function sourceLabel(sourceType: string | null | undefined): string {
+  const key = sourceType?.toLowerCase();
+  return filters.find((f) => f.value !== "all" && f.value === key)?.label ?? sourceType ?? "Unknown source";
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
@@ -153,7 +160,7 @@ function Feed() {
         </section>
 
         {visible.length === 0 ? (
-          <p className="py-16 text-sm leading-relaxed text-muted-foreground">{query ? "No articles match your search." : items.length === 0 ? "No articles yet." : `No ${source === "arxiv" ? "ArXiv" : "GitHub"} articles yet.`}</p>
+          <p className="py-16 text-sm leading-relaxed text-muted-foreground">{query ? "No articles match your search." : items.length === 0 ? "No articles yet." : `No ${filters.find((f) => f.value === source)?.label} articles yet.`}</p>
         ) : (
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((item) => (
@@ -175,7 +182,7 @@ function Feed() {
                     </p>
                   )}
                   <p className="mt-auto pt-5 text-xs font-medium tracking-wide text-muted-foreground">
-                    {item.source_type?.toLowerCase() === "arxiv" ? "arXiv" : item.source_type?.toLowerCase() === "github" ? "GitHub" : item.source_type || "Unknown source"}
+                    {sourceLabel(item.source_type)}
                     <span aria-hidden="true" className="px-1.5 text-primary">·</span>
                     {Math.max(1, Math.round((item.word_count ?? 0) / 200))} min read
                   </p>
