@@ -9,5 +9,5 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Public reading pages fetch only the requested `items` columns through unauthenticated server functions; this keeps SSR shareable and avoids exposing unrelated columns.
-- Article prerequisites and related suggestions remain replaceable query shells in the article route; this keeps their future backend data separate from the public article read.
+- Article explainers and semantic search run as public server functions in `src/lib/explainer.functions.ts` against the owner's external dataset project; the explainer reads/writes the `article_explainers` cache first so the LLM only runs once per article.
+- Search queries are embedded with the same model the dataset was built with (bge-small via Hugging Face) so similarity scores match the stored vectors.
